@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ruta protegida</title>
+  </head>
+  <body>
+    <h1>Ruta protegida</h1>
+    <div id="app">
+      <h2>Email:</h2>
+
+    </div>
+    <button id="logout">Cerrar sesion</button>
+
+    <script>
+      const btn_logout = document.getElementById("logout");
+
+      btn_logout.addEventListener("click", async (e) => {
+        const res = await fetch("api/v1/auth/logout", {
+            method: "GET",
+            credentials: "include",
+          }); 
+          console.log(res)
+      });
+
+      document.addEventListener("DOMContentLoaded", async (e) => {
+        try {
+          //const token = localStorage.getItem("token");
+          //("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2MmI1MTRjMTUwMmMyYjcwODQ0ZGMyZTYiLCJpYXQiOjE2NTYyODI3NDEsImV4cCI6MTY1NjI4MzY0MX0.jIL2lhFnKfvKZDbEiXoYrm2z123Uc3grkR4do8tu_oM");
+          const resToken = await fetch("api/v1/auth/refreshToken", {
+            method: "GET",
+            credentials: "include",
+          });
+
+          const { token } = await resToken.json();
+          console.log("tokensss", token);
+          const res = await fetch("api/v1/auth/protected", {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          console.log(res.status);
+          const data = await res.json();
+          console.log(data);
+          if (res.ok) {
+            document.getElementById("app").textContent = data.email;
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    </script>
+  </body>
+</html>
